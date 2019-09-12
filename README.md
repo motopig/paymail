@@ -1,0 +1,2 @@
+# paymail
+paymail golang server
