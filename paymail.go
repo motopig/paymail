@@ -7,9 +7,8 @@ import (
 	"regexp"
 )
 
-var Domain string
-
 type PayMail struct {
+	Domain string
 	// 检查paymail合法性
 	CheckPayMail func(mail string) bool
 	// 获取pubkey
@@ -23,7 +22,9 @@ func New(p *PayMail) (*PayMail, error) {
 }
 
 func Load(r *gin.Engine, payMailObj PayMail) {
-	r.GET("/.well-known/bsvalias", bsvalias)
+	r.GET("/.well-known/bsvalias", func(c *gin.Context) {
+		bsvalias(c, payMailObj)
+	})
 	api := r.Group("/api")
 	api.GET("/v1/bsvalias/id/:paymail", func(c *gin.Context) {
 		id(c, payMailObj)
@@ -36,14 +37,14 @@ func Load(r *gin.Engine, payMailObj PayMail) {
 	})
 }
 
-func bsvalias(c *gin.Context) {
+func bsvalias(c *gin.Context, payMailObj PayMail) {
 	data := ServiceDiscoveryResponse{
 		Version: Version,
 		Capabilities: Capabilities{
 			SenderValidationUrl:     false,
-			VerifyPublicKeyOwnerUrl: Domain + "/api/v1/bsvalias/verify-pubkey/{alias}@{domain.tld}/{pubkey}",
-			PkiUrl:                  Domain + "/api/v1/bsvalias/id/{alias}@{domain.tld}",
-			PaymentDestinationUrl:   Domain + "/api/v1/bsvalias/address/{alias}@{domain.tld}",
+			VerifyPublicKeyOwnerUrl: payMailObj.Domain + "/api/v1/bsvalias/verify-pubkey/{alias}@{domain.tld}/{pubkey}",
+			PkiUrl:                  payMailObj.Domain + "/api/v1/bsvalias/id/{alias}@{domain.tld}",
+			PaymentDestinationUrl:   payMailObj.Domain + "/api/v1/bsvalias/address/{alias}@{domain.tld}",
 		},
 	}
 	c.JSON(http.StatusOK, data)
