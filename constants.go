@@ -17,7 +17,7 @@ type ServiceDiscoveryResponse struct {
 type Capabilities struct {
 	PkiUrl                  string `json:"pki"`
 	PaymentDestinationUrl   string `json:"paymentDestination"`
-	SenderValidationUrl     string `json:"6745385c3fc0"`
+	SenderValidationUrl     bool   `json:"6745385c3fc0"`
 	VerifyPublicKeyOwnerUrl string `json:"a9f510c16bde"`
 }
 
